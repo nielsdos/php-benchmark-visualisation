@@ -29,7 +29,6 @@
                 // Reformat date
                 for (const entry of rawData) {
                     const str = entry.commit_info.date.date.replace(' ', 'T') + entry.commit_info.date.timezone;
-                    //console.log(str);
                     entry.commit_info.date = new Date(str);
                 }
 
@@ -65,7 +64,23 @@
                             },
                             title: {
                                 display: true,
-                                text: 'PHP performance'
+                                text: 'PHP performance measurements'
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        let label = context.dataset.label;
+
+                                        const {commit_info} = rawData[context.dataIndex];
+                                        
+                                        return [
+                                            label + ": " + context.formattedValue,
+                                            "",
+                                            "Commit ID: " + commit_info.id,
+                                            commit_info.subject,
+                                        ];
+                                    }
+                                }
                             }
                         }
                     },

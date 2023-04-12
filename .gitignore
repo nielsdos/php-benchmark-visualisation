@@ -2,3 +2,4 @@ vendor
 output
 php-benchmark-data
 php-src
+template/data.json
