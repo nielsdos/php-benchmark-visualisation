@@ -93,10 +93,10 @@
                 let chart;
                 const config = {
                     type: 'line',
-                    data,
+                    data: relativeData,
                     options: {
                         responsive: true,
-                        scales: absoluteScales,
+                        scales: relativeScales,
                         plugins: {
                             legend: {
                                 position: 'top',
@@ -135,7 +135,7 @@
                 };
                 chart = new Chart(document.getElementById("chart").getContext("2d"), config);
 
-                let relative = false;
+                let relative = true;
 
                 window.updateChart = () => {
                     relative = !relative;
