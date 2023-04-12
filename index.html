@@ -53,6 +53,23 @@
                     labels.push(entry.commit_info.date.toLocaleString());
                 }
 
+                const relativeData = {
+                    datasets: [
+                        JSON.parse(JSON.stringify(data.datasets[0])),
+                        JSON.parse(JSON.stringify(data.datasets[1])),
+                    ],
+                    labels: data.labels,
+                };
+                for (let i = 0; i < data.datasets.length; ++i) {
+                    const dataPoints = relativeData.datasets[i].data;
+                    for (let j = 1; j < dataPoints.length; ++j) {
+                        if (dataPoints[j])
+                            dataPoints[j] -= dataPoints[j - 1];
+                    }
+                    dataPoints[0] = 0;
+                }
+                //console.log(relativeData);
+
                 let chart;
                 const config = {
                     type: 'line',
@@ -96,6 +113,14 @@
                     },
                 };
                 chart = new Chart(document.getElementById("chart").getContext("2d"), config);
+
+                let relative = false;
+
+                window.updateChart = () => {
+                    relative = !relative;
+                    chart.config.data = relative ? relativeData : data;
+                    chart.update();
+                };
             };
         </script>
         <style>
@@ -109,6 +134,7 @@
         </style>
 	</head>
 	<body>
+        <button onclick="updateChart()">Switch chart type between absolute & relative number of instructions</button>
         <div class="chart-container"><canvas id="chart"></canvas></div>
 	</body>
 </html>
