@@ -39,6 +39,7 @@ jobs:
       with:
         repository: iluuu1994/php-src
         path: php-src
+        fetch-depth: 0
 
     - name: Checkout benchmark data
       uses: actions/checkout@v3
