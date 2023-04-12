@@ -20,7 +20,7 @@ function getPhpRepo(): GitRepository {
 function main(): void {
     $php_src_repo = getPhpRepo();
     $result = [];
-
+    var_dump(glob(BENCHMARK_DATA_PATH."/*"));
     foreach (glob(BENCHMARK_DATA_PATH . "/*/*/summary.json") as $dir) {
         preg_match('|/[a-z0-9]+/([a-z0-9]+)/summary.json$|', $dir, $matches);
         list($file, $commit_id) = $matches;
