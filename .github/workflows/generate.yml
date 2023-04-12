@@ -45,7 +45,7 @@ jobs:
       uses: actions/checkout@v2
       with:
         repository: iluuu1994/php-benchmark-data
-        ref: master
+        ref: main
         path: benchmark-data
 
     - name: Deploy to Github Pages
