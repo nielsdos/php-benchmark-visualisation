@@ -65,15 +65,30 @@
                     let first = dataPoints[0];
                     for (let j = 1; j < dataPoints.length; ++j) {
                         if (dataPoints[j])
-                            dataPoints[j] -= dataPoints[j - 1];
+                            dataPoints[j] = (dataPoints[j] - first) / first * 100;
                     }
                     dataPoints[0] = 0;
-                    for (let j = 1; j < dataPoints.length; ++j) {
-                        if (dataPoints[j])
-                            dataPoints[j] = dataPoints[j] * 100 / first;
-                    }
                 }
                 //console.log(relativeData);
+
+                const relativeScales = {
+                    yAxes: {
+                        title: {display: true, text: 'Percentage improvement over first commit'},
+                        suggestedMin: -100,
+                        suggestedMax: 100,
+                        ticks: {
+                            callback: function(value, index, ticks) {
+                                return value + "%";
+                            }
+                        }
+                    },
+                };
+
+                const absoluteScales = {
+                    yAxes: {
+                        title: {display: true, text: 'Number of instructions (absolute)'},
+                    },
+                };
 
                 let chart;
                 const config = {
@@ -81,6 +96,7 @@
                     data,
                     options: {
                         responsive: true,
+                        scales: absoluteScales,
                         plugins: {
                             legend: {
                                 position: 'top',
@@ -124,6 +140,7 @@
                 window.updateChart = () => {
                     relative = !relative;
                     chart.config.data = relative ? relativeData : data;
+                    chart.config.options.scales = relative ? relativeScales : absoluteScales;
                     chart.update();
                 };
             };
