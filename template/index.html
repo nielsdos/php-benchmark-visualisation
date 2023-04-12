@@ -53,6 +53,7 @@
                     labels.push(entry.commit_info.date.toLocaleString());
                 }
 
+                let chart;
                 const config = {
                     type: 'line',
                     data,
@@ -76,16 +77,25 @@
                                         return [
                                             label + ": " + context.formattedValue,
                                             "",
-                                            "Commit ID: " + commit_info.id,
+                                            "Commit ID: " + commit_info.id.substr(0, 8),
                                             commit_info.subject,
                                         ];
                                     }
                                 }
-                            }
+                            },
+                        },
+                        onClick: function(event) {
+                            const activePoints = chart.getElementsAtEventForMode(event, 'nearest', {intersect: true}, true);
+                            const firstPoint = activePoints[0];
+                            if (!firstPoint) return;
+                            const label = chart.data.labels[firstPoint.index];
+                            const data = rawData[firstPoint.index];
+                            const url = "https://github.com/php/php-src/commit/" + data.commit_info.id;
+                            window.open(url, "_blank");
                         }
                     },
                 };
-                new Chart(document.getElementById("chart").getContext("2d"), config);
+                chart = new Chart(document.getElementById("chart").getContext("2d"), config);
             };
         </script>
         <style>
