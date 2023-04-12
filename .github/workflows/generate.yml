@@ -35,18 +35,21 @@ jobs:
       run: composer install --prefer-dist --no-progress
 
     - name: Checkout PHP source code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         repository: php/php-src
         ref: master
         path: php-src
 
     - name: Checkout benchmark data
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         repository: iluuu1994/php-benchmark-data
         ref: main
         path: benchmark-data
+
+    - name: Generate benchmark data
+      run: php ./generate_json.php
 
     - name: Deploy to Github Pages
       uses: peaceiris/actions-gh-pages@v3
