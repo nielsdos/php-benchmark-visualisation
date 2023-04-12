@@ -46,7 +46,7 @@ jobs:
       with:
         repository: iluuu1994/php-benchmark-data
         ref: main
-        path: benchmark-data
+        path: php-benchmark-data
 
     - name: Generate benchmark data
       run: php ./generate_json.php
