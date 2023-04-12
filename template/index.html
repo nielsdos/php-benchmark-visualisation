@@ -62,11 +62,16 @@
                 };
                 for (let i = 0; i < data.datasets.length; ++i) {
                     const dataPoints = relativeData.datasets[i].data;
+                    let first = dataPoints[0];
                     for (let j = 1; j < dataPoints.length; ++j) {
                         if (dataPoints[j])
                             dataPoints[j] -= dataPoints[j - 1];
                     }
                     dataPoints[0] = 0;
+                    for (let j = 1; j < dataPoints.length; ++j) {
+                        if (dataPoints[j])
+                            dataPoints[j] = dataPoints[j] * 100 / first;
+                    }
                 }
                 //console.log(relativeData);
 
@@ -128,13 +133,25 @@
                 margin: 0;
                 padding: 0;
             }
-            .chart-container {
+            .container {
+                margin-top: 16px;
                 width: 100%;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+            }
+            .chart-container {
+                width: 90%;
             }
         </style>
 	</head>
 	<body>
-        <button onclick="updateChart()">Switch chart type between absolute & relative number of instructions</button>
-        <div class="chart-container"><canvas id="chart"></canvas></div>
+        <div class="container">
+            <button onclick="updateChart()">Switch chart type between absolute & relative number of instructions</button>
+            <div class="chart-container">
+                <canvas id="chart"></canvas>
+            </div>
+        </div>
 	</body>
 </html>
