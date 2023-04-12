@@ -7,7 +7,8 @@ use CzProject\GitPhp\GitRepository;
 use CzProject\GitPhp\GitException;
 
 function writeResult(array $result): void {
-    $file = fopen("data.json", "w");
+    @mkdir("output");
+    $file = fopen("output/data.json", "w");
     fwrite($file, json_encode($result));
     fclose($file);
 }
