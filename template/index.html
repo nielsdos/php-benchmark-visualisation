@@ -10,47 +10,37 @@
 
                 const labels = [];
 
+                const labelToColor = new Map();
+                labelToColor.set('Zend/bench.php', '#7476ad');
+                labelToColor.set('Symfony Demo 2.2.3', 'black');
+                labelToColor.set('Wordpress 6.2', '#36a2eb');
+
                 const data = {
                     labels: labels,
-                    datasets: [
-                        {
-                            label: 'Zend/bench.php',
-                            data: [],
-                            borderColor: "#7476ad",
-                        },
-                        {
-                            label: 'Symfony Demo',
-                            data: [],
-                            borderColor: "black",
-                        },
-                        {
-                            label: 'WordPress',
-                            data: [],
-                            borderColor: "#36a2eb",
-                        }
-                    ]
+                    datasets: [],
                 };
 
+                for (const benchmark of rawData.benchmarks) {
+                    data.datasets.push({
+                        label: benchmark,
+                        data: [],
+                        borderColor: labelToColor.get(benchmark) || 'grey',
+                    });
+                }
+
                 // Reformat date
-                for (const entry of rawData) {
+                for (const entry of rawData.result) {
                     const str = entry.commit_info.date.date.replace(' ', 'T') + entry.commit_info.date.timezone;
                     entry.commit_info.date = new Date(str);
                 }
 
                 // Sort by date
-                rawData.sort((a, b) => {
+                rawData.result.sort((a, b) => {
                     return a.commit_info.date - b.commit_info.date;
                 });
 
-                const summaryToDataSetMapper = {
-                    "bench.php": 0,
-                    "symfony_demo": 1,
-                    "wordpress_6.2": 2,
-                };
-
-                for (const entry of rawData) {
-                    Object.keys(summaryToDataSetMapper).forEach(name => {
-                        const id = summaryToDataSetMapper[name];
+                for (const entry of rawData.result) {
+                    Object.values(rawData.benchmarks).forEach((name, id) => {
                         if (entry.summary[name])
                             data.datasets[id].data.push(entry.summary[name].instructions);
                         else
@@ -60,11 +50,7 @@
                 }
 
                 const relativeData = {
-                    datasets: [
-                        JSON.parse(JSON.stringify(data.datasets[0])),
-                        JSON.parse(JSON.stringify(data.datasets[1])),
-                        JSON.parse(JSON.stringify(data.datasets[2])),
-                    ],
+                    datasets: JSON.parse(JSON.stringify(data.datasets)),
                     labels: data.labels,
                 };
                 for (let i = 0; i < data.datasets.length; ++i) {
@@ -118,7 +104,7 @@
                                     label: function(context) {
                                         let label = context.dataset.label;
 
-                                        const {commit_info} = rawData[context.dataIndex];
+                                        const {commit_info} = rawData.result[context.dataIndex];
                                         
                                         return [
                                             label + ": " + context.formattedValue,
@@ -134,7 +120,7 @@
                             const firstPoint = activePoints[0];
                             if (!firstPoint) return;
                             const label = chart.data.labels[firstPoint.index];
-                            const data = rawData[firstPoint.index];
+                            const data = rawData.result[firstPoint.index];
                             const url = "https://github.com/php/php-src/commit/" + data.commit_info.id;
                             window.open(url, "_blank");
                         }

@@ -25,10 +25,12 @@ function getPhpRepo(): GitRepository {
 function main(): void {
     $php_src_repo = getPhpRepo();
     $result = [];
+    $benchmarks = [];
 
     foreach (glob(BENCHMARK_DATA_PATH . "/*/*/summary.json") as $dir) {
         preg_match('|/[a-z0-9]+/([a-z0-9]+)/summary.json$|', $dir, $matches);
         list($file, $commit_id) = $matches;
+
         try {
             $commit_info = $php_src_repo->getCommit($commit_id);
             echo "Retrieved info about commit $commit_id\n";
@@ -36,8 +38,12 @@ function main(): void {
             echo "Could not retrieve info about commit $commit_id: ", $e->getMessage(), "\n";
             continue;
         }
-        
+
         $summary_data = json_decode(file_get_contents(BENCHMARK_DATA_PATH . $file));
+        foreach (array_keys((array) $summary_data) as $benchmark_name) {
+            $benchmarks[] = $benchmark_name;
+        }
+
         $data = [
             "commit_info" => [
                 "subject" => $commit_info->getSubject(),
@@ -49,7 +55,8 @@ function main(): void {
         $result[] = $data;
     }
 
-    generateOutputFiles($result);
+    $benchmarks = array_unique($benchmarks);
+    generateOutputFiles(['result' => $result, 'benchmarks' => array_values($benchmarks)]);
 }
 
 main();
