@@ -22,6 +22,11 @@
                             label: 'Symfony Demo',
                             data: [],
                             borderColor: "black",
+                        },
+                        {
+                            label: 'WordPress',
+                            data: [],
+                            borderColor: "#36a2eb",
                         }
                     ]
                 };
@@ -40,6 +45,7 @@
                 const summaryToDataSetMapper = {
                     "bench.php": 0,
                     "symfony_demo": 1,
+                    "wordpress_6.2": 2,
                 };
 
                 for (const entry of rawData) {
@@ -57,6 +63,7 @@
                     datasets: [
                         JSON.parse(JSON.stringify(data.datasets[0])),
                         JSON.parse(JSON.stringify(data.datasets[1])),
+                        JSON.parse(JSON.stringify(data.datasets[2])),
                     ],
                     labels: data.labels,
                 };
@@ -69,11 +76,10 @@
                     }
                     dataPoints[0] = 0;
                 }
-                //console.log(relativeData);
 
                 const relativeScales = {
                     yAxes: {
-                        title: {display: true, text: 'Percentage decrease in instruction count since first commit'},
+                        title: {display: true, text: 'Relative change in percentage in instruction count'},
                         suggestedMin: -100,
                         suggestedMax: 100,
                         ticks: {
@@ -93,17 +99,19 @@
                 let chart;
                 const config = {
                     type: 'line',
-                    data: relativeData,
                     options: {
                         responsive: true,
-                        scales: relativeScales,
                         plugins: {
                             legend: {
                                 position: 'top',
                             },
                             title: {
                                 display: true,
-                                text: 'PHP performance measurements'
+                                text: 'PHP performance measurements in number of instructions'
+                            },
+                            subtitle: {
+                                display: true,
+                                text: 'Smaller numbers are better'
                             },
                             tooltip: {
                                 callbacks: {
@@ -114,7 +122,6 @@
                                         
                                         return [
                                             label + ": " + context.formattedValue,
-                                            "",
                                             "Commit ID: " + commit_info.id.substr(0, 8),
                                             commit_info.subject,
                                         ];
@@ -133,16 +140,22 @@
                         }
                     },
                 };
-                chart = new Chart(document.getElementById("chart").getContext("2d"), config);
 
                 let relative = true;
 
+                function updateChartConfig(config) {
+                    config.data = relative ? relativeData : data;
+                    config.options.scales = relative ? relativeScales : absoluteScales;
+                }
+
                 window.updateChart = () => {
                     relative = !relative;
-                    chart.config.data = relative ? relativeData : data;
-                    chart.config.options.scales = relative ? relativeScales : absoluteScales;
+                    updateChartConfig(chart.config);
                     chart.update();
                 };
+
+                updateChartConfig(config);
+                chart = new Chart(document.getElementById("chart").getContext("2d"), config);
             };
         </script>
         <style>
@@ -161,11 +174,32 @@
             .chart-container {
                 width: 90%;
             }
+            .button-container {
+                width: 90%;
+                display: flex;
+                flex-direction: row;
+                justify-content: space-between;
+            }
+            .button-container > * {
+                margin: .5em;
+            }
+            .button-container > .links {
+                font-size: 0.9rem;
+            }
+            .button-container > .links > a {
+                margin: .5em;
+            }
         </style>
 	</head>
 	<body>
         <div class="container">
-            <button onclick="updateChart()">Switch chart type between absolute & relative number of instructions</button>
+            <div class="button-container">
+                <button onclick="updateChart()">Switch chart between absolute / relative numbers</button>
+                <div class="links">
+                    <a href="https://github.com/iluuu1994/php-benchmark-data" rel="noopener" target="_blank">Benchmark data repo</a>
+                    <a href="https://github.com/nielsdos/php-benchmark-visualisation" rel="noopener" target="_blank">Visualisation repo</a>
+                </div>
+            </div>
             <div class="chart-container">
                 <canvas id="chart"></canvas>
             </div>
