@@ -76,11 +76,10 @@
                     }
                     dataPoints[0] = 0;
                 }
-                //console.log(relativeData);
 
                 const relativeScales = {
                     yAxes: {
-                        title: {display: true, text: 'Percentage decrease in instruction count since first commit'},
+                        title: {display: true, text: 'Relative change in percentage in instruction count'},
                         suggestedMin: -100,
                         suggestedMax: 100,
                         ticks: {
@@ -121,7 +120,6 @@
                                         
                                         return [
                                             label + ": " + context.formattedValue,
-                                            "",
                                             "Commit ID: " + commit_info.id.substr(0, 8),
                                             commit_info.subject,
                                         ];
@@ -140,16 +138,22 @@
                         }
                     },
                 };
-                chart = new Chart(document.getElementById("chart").getContext("2d"), config);
 
                 let relative = true;
 
+                function updateChartConfig(config) {
+                    config.data = relative ? relativeData : data;
+                    config.options.scales = relative ? relativeScales : absoluteScales;
+                }
+
                 window.updateChart = () => {
                     relative = !relative;
-                    chart.config.data = relative ? relativeData : data;
-                    chart.config.options.scales = relative ? relativeScales : absoluteScales;
+                    updateChartConfig(chart.config);
                     chart.update();
                 };
+
+                updateChartConfig(config);
+                chart = new Chart(document.getElementById("chart").getContext("2d"), config);
             };
         </script>
         <style>
