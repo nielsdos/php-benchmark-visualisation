@@ -6,8 +6,13 @@ use CzProject\GitPhp\Git;
 use CzProject\GitPhp\GitRepository;
 use CzProject\GitPhp\GitException;
 
-function writeResult(array $result): void {
+function generateOutputFiles(array $result): void {
     @mkdir("output");
+    writeResult($result);
+    copy("template/index.html", "output/index.html");
+}
+
+function writeResult(array $result): void {
     $file = fopen("output/data.json", "w");
     fwrite($file, json_encode($result));
     fclose($file);
@@ -44,8 +49,7 @@ function main(): void {
         $result[] = $data;
     }
 
-    writeResult($result);
-    copy("template/index.html", "output/index.html");
+    generateOutputFiles($result);
 }
 
 main();
