@@ -99,17 +99,19 @@
                 let chart;
                 const config = {
                     type: 'line',
-                    data: relativeData,
                     options: {
                         responsive: true,
-                        scales: relativeScales,
                         plugins: {
                             legend: {
                                 position: 'top',
                             },
                             title: {
                                 display: true,
-                                text: 'PHP performance measurements'
+                                text: 'PHP performance measurements in number of instructions'
+                            },
+                            subtitle: {
+                                display: true,
+                                text: 'Smaller numbers are better'
                             },
                             tooltip: {
                                 callbacks: {
@@ -176,7 +178,7 @@
 	</head>
 	<body>
         <div class="container">
-            <button onclick="updateChart()">Switch chart type between absolute & relative number of instructions</button>
+            <button onclick="updateChart()">Switch chart between absolute / relative numbers</button>
             <div class="chart-container">
                 <canvas id="chart"></canvas>
             </div>
