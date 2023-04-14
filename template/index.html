@@ -108,9 +108,12 @@
                                         let label = context.dataset.label;
 
                                         const {commit_info} = rawData.result[context.dataIndex];
-                                        
+                                        let value = context.formattedValue;
+                                        if (relative)
+                                            value += "%";
+
                                         return [
-                                            label + ": " + context.formattedValue,
+                                            label + ": " + value,
                                             "Commit ID: " + commit_info.id.substr(0, 8),
                                             commit_info.subject,
                                         ];
