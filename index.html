@@ -69,8 +69,8 @@
                 const relativeScales = {
                     yAxes: {
                         title: {display: true, text: 'Relative change in percentage in instruction count'},
-                        suggestedMin: -100,
-                        suggestedMax: 100,
+                        //suggestedMin: -100,
+                        //suggestedMax: 100,
                         ticks: {
                             callback: function(value, index, ticks) {
                                 return value + "%";
@@ -108,9 +108,12 @@
                                         let label = context.dataset.label;
 
                                         const {commit_info} = rawData.result[context.dataIndex];
-                                        
+                                        let value = context.formattedValue;
+                                        if (relative)
+                                            value += "%";
+
                                         return [
-                                            label + ": " + context.formattedValue,
+                                            label + ": " + value,
                                             "Commit ID: " + commit_info.id.substr(0, 8),
                                             commit_info.subject,
                                         ];
