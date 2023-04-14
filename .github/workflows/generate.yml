@@ -37,16 +37,16 @@ jobs:
     - name: Checkout PHP source code
       uses: actions/checkout@v3
       with:
-        repository: iluuu1994/php-src
+        repository: php/php-src
         path: php-src
         fetch-depth: 0
 
     - name: Checkout benchmark data
       uses: actions/checkout@v3
       with:
-        repository: iluuu1994/php-benchmark-data
+        repository: php/benchmarking-data
         ref: main
-        path: php-benchmark-data
+        path: benchmarking-data
 
     - name: Generate benchmark data
       run: php ./generate_json.php
