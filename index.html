@@ -73,7 +73,7 @@
                         //suggestedMax: 100,
                         ticks: {
                             callback: function(value, index, ticks) {
-                                return value + "%";
+                                return value.toFixed(3) + "%";
                             }
                         }
                     },
