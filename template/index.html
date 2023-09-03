@@ -4,9 +4,44 @@
 		<title>Performance graphs</title>
 		<meta charset="utf-8">
         <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js" integrity="sha512-ElRFoEQdI5Ht6kZvyzXhYG9NqjtkmlkfYk0wr6wHxU9JEHakS7UJZNeml5ALk+8IKlU6jDgMabC3vkumRokgJA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-zoom/2.0.1/chartjs-plugin-zoom.min.js" integrity="sha512-wUYbRPLV5zs6IqvWd88HIqZU/b8TBx+I8LEioQ/UC0t5EMCLApqhIAnUg7EsAzdbhhdgW07TqYDdH3QEXRcPOQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
         <script>
+            function getSelectedBranch() {
+                const s = new URLSearchParams(location.search);
+                return s.get("branch") ?? "master";
+            }
+
+            function setupBranchSelector(selectedBranch, branches) {
+                const branchSelector = document.getElementById("branch-select");
+                for (const branch of branches) {
+                    const option = document.createElement("option");
+                    option.value = branch;
+                    option.innerText = branch;
+                    option.selected = branch === selectedBranch;
+                    branchSelector.appendChild(option);
+                }
+                branchSelector.onchange = () => {
+                    const s = new URLSearchParams(location.search);
+                    s.set("branch", branchSelector.value);
+                    location.search = s.toString();
+                };
+            }
+
             window.onload = async _ => {
                 const rawData = await fetch('data.json').then(r => r.json());
+
+                const branches = Object.keys(rawData);
+                branches.pop(); // Remove "benchmarks" key
+
+                let selectedBranch = getSelectedBranch();
+                if (branches.indexOf(selectedBranch) === -1) {
+                    alert("Invalid branch selection");
+                    selectedBranch = "master";
+                }
+
+                const branchData = rawData[selectedBranch];
+
+                setupBranchSelector(selectedBranch, branches);
 
                 const labels = [];
 
@@ -32,17 +67,17 @@
                 }
 
                 // Reformat date
-                for (const entry of rawData.result) {
+                for (const entry of branchData) {
                     const str = entry.commit_info.date.date.replace(' ', 'T') + entry.commit_info.date.timezone;
                     entry.commit_info.date = new Date(str);
                 }
 
                 // Sort by date
-                rawData.result.sort((a, b) => {
+                branchData.sort((a, b) => {
                     return a.commit_info.date - b.commit_info.date;
                 });
 
-                for (const entry of rawData.result) {
+                for (const entry of branchData) {
                     Object.values(rawData.benchmarks).forEach((name, id) => {
                         if (entry.summary[name])
                             data.datasets[id].data.push(entry.summary[name].instructions);
@@ -107,7 +142,7 @@
                                     label: function(context) {
                                         let label = context.dataset.label;
 
-                                        const {commit_info} = rawData.result[context.dataIndex];
+                                        const {commit_info} = branchData[context.dataIndex];
                                         let value = context.formattedValue;
                                         if (relative)
                                             value += "%";
@@ -120,13 +155,28 @@
                                     }
                                 }
                             },
+                            zoom: {
+                                zoom: {
+                                    wheel: {
+                                        enabled: true,
+                                    },
+                                    pinch: {
+                                        enabled: true
+                                    },
+                                    drag: {
+                                        enabled: true,
+                                    },
+                                    mode: 'x',
+                                    scaleMode: 'x',
+                                }
+                            }
                         },
                         onClick: function(event) {
                             const activePoints = chart.getElementsAtEventForMode(event, 'nearest', {intersect: true}, true);
                             const firstPoint = activePoints[0];
                             if (!firstPoint) return;
                             const label = chart.data.labels[firstPoint.index];
-                            const data = rawData.result[firstPoint.index];
+                            const data = branchData[firstPoint.index];
                             const url = "https://github.com/php/php-src/commit/" + data.commit_info.id;
                             window.open(url, "_blank");
                         }
@@ -187,6 +237,10 @@
         <div class="container">
             <div class="button-container">
                 <button onclick="updateChart()">Switch chart between absolute / relative numbers</button>
+                <div>
+                    <span>Branch: </span>
+                    <select id="branch-select"></select>
+                </div>
                 <div class="links">
                     <a href="https://github.com/php/benchmarking-data" rel="noopener" target="_blank">Benchmark data repo</a>
                     <a href="https://github.com/nielsdos/php-benchmark-visualisation" rel="noopener" target="_blank">Visualisation repo</a>

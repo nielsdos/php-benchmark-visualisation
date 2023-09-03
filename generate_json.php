@@ -40,11 +40,14 @@ function main(): void {
         }
 
         $summary_data = json_decode(file_get_contents(BENCHMARK_DATA_PATH . $file));
+        // We only started recording the branch after the 8.3 split-off into 8.4.
+        $branch = $summary_data->branch ?? "PHP-8.3";
+        unset($summary_data->branch);
         foreach (array_keys((array) $summary_data) as $benchmark_name) {
             $benchmarks[] = $benchmark_name;
         }
 
-        $data = [
+        $result_data = [
             "commit_info" => [
                 "subject" => $commit_info->getSubject(),
                 "date" => $commit_info->getCommitterDate(),
@@ -52,11 +55,14 @@ function main(): void {
             ],
             "summary" => $summary_data,
         ];
-        $result[] = $data;
+        if (!isset($result[$branch])) {
+            $result[$branch] = [];
+        }
+        $result[$branch][] = $result_data;
     }
 
     $benchmarks = array_unique($benchmarks);
-    generateOutputFiles(['result' => $result, 'benchmarks' => array_values($benchmarks)]);
+    generateOutputFiles(['PHP-8.3' => $result["PHP-8.3"], 'master' => $result["master"], 'benchmarks' => array_values($benchmarks)]);
 }
 
 main();
