@@ -41,7 +41,7 @@ function main(): void {
 
         $summary_data = json_decode(file_get_contents(BENCHMARK_DATA_PATH . $file));
         // We only started recording the branch after the 8.3 split-off into 8.4.
-        $branch = $summary_data->branch ?? "PHP-8.3";
+        $branch = $summary_data->branch ?? "master";
         unset($summary_data->branch);
         foreach (array_keys((array) $summary_data) as $benchmark_name) {
             $benchmarks[] = $benchmark_name;
