@@ -95,12 +95,15 @@
                 };
                 for (let i = 0; i < data.datasets.length; ++i) {
                     const dataPoints = relativeData.datasets[i].data;
-                    let first = dataPoints[0];
-                    for (let j = 1; j < dataPoints.length; ++j) {
+                    let firstNonNull = 0;
+                    while (firstNonNull < dataPoints.length && !dataPoints[firstNonNull])
+                        firstNonNull++;
+                    let first = dataPoints[firstNonNull];
+                    for (let j = firstNonNull + 1; j < dataPoints.length; ++j) {
                         if (dataPoints[j])
                             dataPoints[j] = (dataPoints[j] - first) / first * 100;
                     }
-                    dataPoints[0] = 0;
+                    dataPoints[firstNonNull] = 0;
                 }
 
                 const relativeScales = {
