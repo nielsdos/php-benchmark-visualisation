@@ -62,7 +62,10 @@ function main(): void {
     }
 
     $benchmarks = array_unique($benchmarks);
-    generateOutputFiles(['PHP-8.3' => $result["PHP-8.3"], 'master' => $result["master"], 'benchmarks' => array_values($benchmarks)]);
+    $benchmarks = array_values($benchmarks);
+    unset($benchmarks["Laravel 10.10"]);
+    unset($benchmarks["Laravel 10.10 JIT"]);
+    generateOutputFiles(['PHP-8.3' => $result["PHP-8.3"], 'master' => $result["master"], 'benchmarks' => $benchmarks]);
 }
 
 main();
