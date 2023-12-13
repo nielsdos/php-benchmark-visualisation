@@ -86,7 +86,7 @@
                         else
                             data.datasets[id].data.push(null);
                     });
-                    labels.push(entry.commit_info.date.toLocaleString());
+                    labels.push(entry.commit_info.date.toLocaleDateString());
                 }
 
                 const relativeData = {
